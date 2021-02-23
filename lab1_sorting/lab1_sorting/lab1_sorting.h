@@ -7,10 +7,10 @@
 
 using namespace std;
 //функция, сливающая массивы
-void merge(int* A, int first, int last) {
+void Merge(int* A, int first, int last) {
     int middle, start, final, j;
     int* mas = new int[last + 1];
-    middle = (first + last) / 2;  //вычисление среднего элемента
+    middle = (first + last) / 2;  //вычисление среднего элемента (округляется в меньшую сторону)
     start = first;                //начало левой части
     final = middle + 1;           //начало правой части
     for (j = first; j <= last; j++)  //выполнять от начала до конца
@@ -29,28 +29,32 @@ void merge(int* A, int first, int last) {
 };
 
 //рекурсивная процедура сортировки
-void mergeSort(int* A, int first, int last) {
+void MergeSort(int* A, int first, int last) {
     if (first < last) {
-        mergeSort(A, first, (first + last) / 2);  //сортировка левой части
-        mergeSort(A, (first + last) / 2 + 1, last);  //сортировка правой части
-        merge(A, first, last);  //слияние двух частей
+        int middle = (first + last) / 2;
+        MergeSort(A, first, middle);  //сортировка левой части
+        MergeSort(A, middle + 1, last);  //сортировка правой части
+        Merge(A, first, last);  //слияние двух частей
     }
 }
 
 //получить максимальное отриц число массива
-int getMaxNegative(int* A, int first, int last) {
-    int maxNegative = 0;
+int GetMaxNegative(int* A, int first, int last) {
+    int maxNegative=1;
+    int flag = 0;
     for (int i = 1; i <= last; i++) {
-        if (A[i] < 0 && (A[i] > maxNegative || maxNegative == 0)) {
+        if (A[i] < 0 && (flag == 0 || maxNegative < A[i])) {
             maxNegative = A[i];
+            flag = 1;
+
         }
     }
-    if (maxNegative == 0) throw exception("Exception: no negative numbers");
-    return maxNegative;
+    if (flag == 0) throw exception("Exception: no negative numbers");
+    else return maxNegative;
 }
 
 //сохранения массива в файл
-bool saveArrayInFile(int* A, int first, int last, const std::string& filename)
+bool SaveArrayInFile(int* A, int first, int last, const std::string& filename)
 {
     /*
     Первое число в файле будет N, остальные - элементы массива
@@ -75,7 +79,7 @@ bool saveArrayInFile(int* A, int first, int last, const std::string& filename)
 }
 
 //чтения количества элементов массива из файла
-int readArrayN(const std::string& filename) {
+int ReadArrayN(const std::string& filename) {
     ifstream in;
     string str_n;
     int n = 0;
@@ -99,7 +103,7 @@ int readArrayN(const std::string& filename) {
 }
 
 //вывод массива
-void displayArray(int* A, int first, int last) {
+void DisplayArray(int* A, int first, int last) {
     for (int i = first; i <= last; i++) {
         cout << A[i] << " ";
     }
