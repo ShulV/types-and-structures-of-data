@@ -1,8 +1,9 @@
 ﻿#include "binaryTree1.h"
 int numcmp(int a, int b);// Сравнение чисел
 struct tnode* addNode(struct tnode* p, int key);// Функция добавления узла к дереву
-void randomAdd_N_Nodes(struct tnode* node, int quantity);// Добавление N узлов к дереву с рандомным значением
+void randomAdd_N_Nodes(struct tnode** node, int quantity);// Добавление N узлов к дереву с рандомным значением
 void deleteNode(tnode* tree);// Функция удаления поддерева
+tnode* findNode(tnode* node, int key, int level);// Поиск в бинарном дереве по значению
 void printTree(struct tnode* p);// Функция вывода дерева
 int readArrayN(const std::string& filename);// Чтения количества элементов массива из файла
 void SaveTreeInFile(struct tnode* node, const std::string& filename);//сохранить дерево в файл
@@ -17,24 +18,16 @@ int main(int argc, char* argv[])
     string out_filneame = "output.dat";
 
     int n = 0;// Кол-во узлов для записи из файла
-    int key; // Ключ
+    int key = 0; // Ключ
+    int level = 0; // Уровень
     char choice; // Выбор
     struct tnode* root;
     root = NULL;
 
-    key = 10;
-    
-    do {
-        key--;
-        cout << "key =" << key << endl;
-         root = addNode(root, key);
-    } while (key);   
-
-
     do
     {
-        cout << "Лаба 3. Бинарные деревья." << endl;
-        printf("\n\t1 - Read file and fill tree;\n\t2 - Save tree in file;\n\t3-Add element;\n\t4-Delete element;\n\t5 - Print tree;\n\t0-Exit:\nYour choice:\t");
+        cout << "Lab 3. Binary trees." << endl;
+        printf("\n\t1 - Read file and fill tree;\n\t2 - Save tree in file;\n\t3 - Add element;\n\t4 - Delete tree;\n\t5 - Print tree;\n\t0 - Exit:\nYour choice:\t");
         fflush(stdin);
         choice = _getch();
         printf("\n");
@@ -46,7 +39,7 @@ int main(int argc, char* argv[])
         case '1':
             n = readArrayN(in_filneame);
             cout << "N = " << n << endl;
-            randomAdd_N_Nodes(root, n);
+            randomAdd_N_Nodes(&root, n);
             _getch();
             break;
         case '2':
@@ -61,14 +54,27 @@ int main(int argc, char* argv[])
             _getch();
             break;
         case '4':
-            while (!(fflush(stdin)) && !(printf("Enter key to delete ") && scanf_s("%d", &key)));//ввод ключа
+            cout << "\nTree will be deleted" << endl;
             deleteNode(root);
             root = NULL;
             _getch();
             break;
         case '5':
-            printf("List view:\n");//вывод в прямом порядке
+            cout << "\nTree:\n";//вывод в прямом порядке
             printTree(root);
+            _getch();
+            break;
+        case '6':
+            tnode *node2;
+            while (!(fflush(stdin)) && !(printf("Enter key to search: ") && scanf_s("%d", &key)));//ввод ключа
+            while (!(fflush(stdin)) && !(printf("Enter level to search: ") && scanf_s("%d", &level)));//ввод уровня
+            node2=findNode(root, key, level);
+            if (node2!=NULL)
+            {
+                cout << "Was found" << endl;
+                cout << node2->key << " level: " << node2->level << endl;
+            }
+            else cout << "Was not found" << endl;
             _getch();
             break;
         }

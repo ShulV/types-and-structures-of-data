@@ -17,7 +17,6 @@ struct tnode {// Узел дерева
     int level;//уровень
     struct tnode* left;// Левый потомок
     struct tnode* right;// Правый потомок
-    struct tnode* parent;// Родитель
     
 };
 int numcmp(int a, int b)
@@ -33,31 +32,29 @@ struct tnode* addNode(struct tnode* node, int key) {
         node = new tnode();
         node->key = key;
         node->level = 0;
-        node->left = node->right = node->parent = NULL;
+        node->left = node->right = NULL;
 
     }
     else 
         if((cond = numcmp(key, node->key)) != 0){
             if (cond < 0) {
                 node->left = addNode(node->left, key);
-                node->left->parent = node;
                 node->left->level = node->level + 1;
             }
             else {
                 node->right = addNode(node->right, key);
-                node->right->parent = node;
                 node->right->level = node->level + 1;
             }
                 
         }
     return node;
 }
-//добавление N узлов к дереву с рандомным значением
-void randomAdd_N_Nodes(struct tnode* node, int quantity) {
+// Добавление N узлов к дереву с рандомным значением
+void randomAdd_N_Nodes(struct tnode** node, int quantity) {
     int number;
     for (int i = 0; i < quantity; i++) {
         number = rand() % 100 - 50;
-        addNode(node, number);
+        *node=addNode(*node, number);
     }
 }
 // Функция удаления поддерева
@@ -68,6 +65,44 @@ void deleteNode(tnode* node) {
         delete node;
     }
 }
+// Поиск в бинарном дереве
+tnode* findNode(tnode* node, int key, int level) {
+    tnode* ptr;
+    
+    if (node != NULL) {// Если дерево имеет хотя бы 1 элемент
+        if (node->key == key) // Если вершина дерева - то, что мы ищем,
+            return node;// Присвоим её node_ad
+        else {// Иначе ищём этот элемент, двигаясь по узлам по единственному пути
+            ptr = node;
+            while (ptr != NULL)
+                if (ptr->level == level && ptr->key == key) 
+                    return ptr;     
+                else {
+                    if (ptr->key > key) ptr = ptr->left;
+                    else ptr = ptr->right;
+                    if (ptr->level > level || ptr == NULL) return NULL;// Если прошли нужный уровень или узел пуст
+                }
+                    
+        }
+    }
+    return NULL;
+}
+
+// TODO Удаление
+tnode* deleteNode(tnode* node, tnode* del_node) {
+    if (node != NULL) {
+        tnode* tmp, *node2;
+        if (node != del_node) {
+            tmp = node;
+            tmp = addNode(tmp, tmp->key);
+        }
+            
+        
+    }
+    else 
+        return node;
+}
+
 // Функция вывода дерева
 void printTree(struct tnode* node) {
     if (node != NULL) {
@@ -77,7 +112,7 @@ void printTree(struct tnode* node) {
     }
 }
 
-int readArrayN(const std::string& filename)//чтения количества элементов массива из файла
+int readArrayN(const std::string& filename)// Чтения количества элементов массива из файла
 {
     ifstream in;
     string str_n;
@@ -99,7 +134,7 @@ int readArrayN(const std::string& filename)//чтения количества элементов массива
     }
     return n;
 }
-//сохранения числа в файл
+// Сохранения числа в файл
 bool SaveNumberInFile(const std::string& filename, int key)
 {
     ofstream out;
@@ -113,20 +148,20 @@ bool SaveNumberInFile(const std::string& filename, int key)
     return true;
 }
 
-//сохранить дерево в файл
+// Сохранить дерево в файл
 void SaveTreeInFile(struct tnode* node, const std::string& filename)
 {
     if (node != NULL) {
         SaveTreeInFile(node->left, filename);
-        SaveNumberInFile(filename, node->key);//сохранить 1 значение в файл
+        SaveNumberInFile(filename, node->key);// Сохранить 1 значение в файл
         SaveTreeInFile(node->right, filename);
     }
 }
 
-//очистить файл
+// Очистить файл
 void clearFile(const std::string& filename) {
     ofstream out;
     // Open the file.
-    out.open(filename, ios::trunc);//пересоздать файл (сделать пустым)
+    out.open(filename, ios::trunc);// Пересоздать файл (сделать пустым)
     out.close();
 }
