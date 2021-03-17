@@ -13,27 +13,20 @@ using namespace std;
 * реализация
 */
 
-
 template<typename T>
 class List
 {
 public:
 	List();
 	~List();
-
 	//добавление элемента в конец списка
 	void push_back(T data);
-
 	//удаление элемента в списке по указанному индексу
 	void removeAt(int index);
-
 	// получить количество елементов в списке
 	int GetSize() { return Size; }
-
 	// перегруженный оператор [] 
 	T& operator[](const int index);
-	
-
 private:
 	template<typename T>
 	class Node
@@ -41,7 +34,6 @@ private:
 	public:
 		Node *pNext, *pPrev;
 		T data;
-
 		Node(T data = T(), Node* pNext = nullptr, Node* pPrev = nullptr)
 		{
 			this->data = data;
@@ -96,36 +88,39 @@ void List<T>::push_back(T data)
 template<typename T>
 void List<T>::removeAt(int index)
 {
-
-	if (index == 0)
-	{
-		Node<T>* toDelete = this->head;
-		Node<T>* previous = toDelete->pPrev;
-		//cout << "prev = " << previous->data << endl;
-		Node<T>* next = toDelete->pNext;
-		previous->pNext = next;
-		next->pPrev = previous;
-		Size--;
-		this->head = this->head->pNext;
-		delete toDelete;
-		
+	if (this->GetSize() < index || index < 0) {
+		throw exception("Wrong function using");
 	}
-	else
-	{
-		Node<T>* previous = this->head;
-		for (int i = 0; i < index - 1; i++)
+	else {
+		if (index == 0)
 		{
-			previous = previous->pNext;
+			Node<T>* previous = head->pPrev;
+			//cout << "prev = " << previous->data << endl;
+			Node<T>* next = head->pNext;
+			previous->pNext = next;
+			next->pPrev = previous;
+			if (Size > 0) this->head = this->head->pNext;
+			else head = nullptr;//если список стал пустым
+			Size--;
+			
 		}
+		else
+		{
+			Node<T>* previous = this->head;
+			for (int i = 0; i < index - 1; i++)
+			{
+				previous = previous->pNext;
+			}
 
-		Node<T>* toDelete = previous->pNext;
-		Node<T>* next = toDelete->pNext;
-		previous->pNext = next;
-		next->pPrev = previous;
-		delete toDelete;
-
-		Size--;
+			Node<T>* toDelete = previous->pNext;
+			Node<T>* next = toDelete->pNext;
+			previous->pNext = next;
+			next->pPrev = previous;
+			delete toDelete;
+			Size--;
+		}
 	}
+	
 	
 }
 

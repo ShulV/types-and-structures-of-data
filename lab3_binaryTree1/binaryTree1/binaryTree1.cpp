@@ -2,13 +2,16 @@
 int numcmp(int a, int b);// Сравнение чисел
 struct tnode* addNode(struct tnode* p, int key);// Функция добавления узла к дереву
 void randomAdd_N_Nodes(struct tnode** node, int quantity);// Добавление N узлов к дереву с рандомным значением
-void deleteNode(tnode* tree);// Функция удаления поддерева
+void deleteSubTree(tnode* tree);// Функция удаления поддерева
+tnode* deleteRootSubTree(tnode* node);// Удаление корневого узла
+void deleteNode(tnode* node, tnode* del_node, int level);// Удаление узла
 tnode* findNode(tnode* node, int key, int level);// Поиск в бинарном дереве по значению
 void printTree(struct tnode* p);// Функция вывода дерева
 int readArrayN(const std::string& filename);// Чтения количества элементов массива из файла
-void SaveTreeInFile(struct tnode* node, const std::string& filename);//сохранить дерево в файл
-bool SaveNumberInFile(const std::string& filename, int key);//сохранения числа в файл
-void clearFile(const std::string& filename);//очистить файл
+void SaveTreeInFile(struct tnode* node, const std::string& filename);// Сохранить дерево в файл
+bool SaveNumberInFile(const std::string& filename, int key);// Сохранения числа в файл
+void clearFile(const std::string& filename);// Очистить файл
+
 
 int main(int argc, char* argv[])
 {
@@ -27,7 +30,7 @@ int main(int argc, char* argv[])
     do
     {
         cout << "Lab 3. Binary trees." << endl;
-        printf("\n\t1 - Read file and fill tree;\n\t2 - Save tree in file;\n\t3 - Add element;\n\t4 - Delete tree;\n\t5 - Print tree;\n\t0 - Exit:\nYour choice:\t");
+        printf("\n\t1 - Read file and fill tree;\n\t2 - Save tree in file;\n\t3 - Add element;\n\t4 - Delete tree;\n\t5 - Print tree;\n\t6 - Find and delete node;\n\t0 - Exit:\nYour choice:\t");
         fflush(stdin);
         choice = _getch();
         printf("\n");
@@ -55,16 +58,20 @@ int main(int argc, char* argv[])
             break;
         case '4':
             cout << "\nTree will be deleted" << endl;
-            deleteNode(root);
+            deleteSubTree(root);
             root = NULL;
             _getch();
             break;
         case '5':
-            cout << "\nTree:\n";//вывод в прямом порядке
-            printTree(root);
+            if (root) {
+                cout << "\nTree:\n";//вывод в прямом порядке
+                printTree(root);
+            }
+            else cout << "\nTree is empty:\n";
             _getch();
             break;
         case '6':
+            /*
             tnode *node2;
             while (!(fflush(stdin)) && !(printf("Enter key to search: ") && scanf_s("%d", &key)));//ввод ключа
             while (!(fflush(stdin)) && !(printf("Enter level to search: ") && scanf_s("%d", &level)));//ввод уровня
@@ -73,8 +80,15 @@ int main(int argc, char* argv[])
             {
                 cout << "Was found" << endl;
                 cout << node2->key << " level: " << node2->level << endl;
+                
             }
+            
             else cout << "Was not found" << endl;
+            */
+            
+
+            root = deleteRootSubTree(root);
+            cout << "Root is deleted" << endl;
             _getch();
             break;
         }

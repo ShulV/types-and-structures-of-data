@@ -36,35 +36,83 @@ struct tnode* addNode(struct tnode* node, int key) {
 
     }
     else 
-        if((cond = numcmp(key, node->key)) != 0){
-            if (cond < 0) {
-                node->left = addNode(node->left, key);
-                node->left->level = node->level + 1;
-            }
-            else {
-                node->right = addNode(node->right, key);
-                node->right->level = node->level + 1;
-            }
-                
+    {
+        cond = numcmp(key, node->key);
+        if (cond < 0) {
+            node->left = addNode(node->left, key);
+            node->left->level = node->level + 1;
         }
+        else {
+            node->right = addNode(node->right, key);
+            node->right->level = node->level + 1;
+        }
+    }
+        
+                
+        
     return node;
 }
 // Добавление N узлов к дереву с рандомным значением
 void randomAdd_N_Nodes(struct tnode** node, int quantity) {
     int number;
     for (int i = 0; i < quantity; i++) {
-        number = rand() % 100 - 50;
+        number = pow(-1,i)*i;// rand() % 100 - 50;
         *node=addNode(*node, number);
     }
 }
 // Функция удаления поддерева
-void deleteNode(tnode* node) {
+void deleteSubTree(tnode* node) {
     if (node != NULL) {
-        deleteNode(node->left);
-        deleteNode(node->right);
+        deleteSubTree(node->left);
+        deleteSubTree(node->right);
         delete node;
     }
 }
+// Функция вывода дерева
+void printTree(struct tnode* node) {
+    if (node != NULL) {
+        printTree(node->left);
+        cout << "ключ: " << node->key << "\t\tуровень: " << node->level << endl;
+        printTree(node->right);
+    }
+
+}
+// TODO Удаление узла
+tnode* deleteRootSubTree(tnode* node) {
+    if (node != NULL) {
+        cout << "removing from root" << endl;
+
+        if (node->left == NULL && node->right == NULL) {
+            return NULL;
+        }
+        if (node->left != NULL && node->right == NULL) {
+            node = node->left;// Присваиваем корню левую часть дерева (от корня)
+            return node;
+        }
+        if (node->left == NULL && node->right != NULL) {
+            node = node->right;// Присваиваем корню правую часть дерева (от корня)
+            return node;
+        }
+        if (node->left != NULL && node->right != NULL) {
+            tnode* left_node = node->left;// Сохраняем левую часть дерева (от корня)
+            node = node->right;// Присваиваем корню правую часть дерева (от корня)
+            //нужно левую часть дерева вставить после наименьшего элемента в дереве 
+            
+            tnode* tmp = node;// Временный узел для прохода по ветке
+            while (tmp->left != NULL) {
+                tmp = (tmp)->left;
+            }
+            tmp->left = left_node;// НЕ РАБОТАЕТ, РАЗОАБРАТЬСЯ С УКАЗАТЕЛЯМИ!
+            return node;
+        }
+        
+        
+        return node;// = *left_node;//<последний наименьший элмент в правом дереве>->left = бывшее левое дерево
+        
+    }
+    else node;
+}
+
 // Поиск в бинарном дереве
 tnode* findNode(tnode* node, int key, int level) {
     tnode* ptr;
@@ -88,29 +136,7 @@ tnode* findNode(tnode* node, int key, int level) {
     return NULL;
 }
 
-// TODO Удаление
-tnode* deleteNode(tnode* node, tnode* del_node) {
-    if (node != NULL) {
-        tnode* tmp, *node2;
-        if (node != del_node) {
-            tmp = node;
-            tmp = addNode(tmp, tmp->key);
-        }
-            
-        
-    }
-    else 
-        return node;
-}
 
-// Функция вывода дерева
-void printTree(struct tnode* node) {
-    if (node != NULL) {
-        printTree(node->left);
-        cout << "ключ: " << node->key << "\t\tуровень: " << node->level << endl;
-        printTree(node->right);
-    }
-}
 
 int readArrayN(const std::string& filename)// Чтения количества элементов массива из файла
 {
