@@ -1,17 +1,4 @@
 ﻿#include "binaryTree1.h"
-int numcmp(int a, int b);// Сравнение чисел
-struct tnode* addNode(struct tnode* p, int key);// Функция добавления узла к дереву
-void randomAdd_N_Nodes(struct tnode** node, int quantity);// Добавление N узлов к дереву с рандомным значением
-void deleteSubTree(tnode* tree);// Функция удаления поддерева
-tnode* deleteRootSubTree(tnode* node);// Удаление корневого узла
-void deleteNode(tnode* node, tnode* del_node, int level);// Удаление узла
-tnode* findNode(tnode* node, int key, int level);// Поиск в бинарном дереве по значению
-void printTree(struct tnode* p);// Функция вывода дерева
-int readArrayN(const std::string& filename);// Чтения количества элементов массива из файла
-void SaveTreeInFile(struct tnode* node, const std::string& filename);// Сохранить дерево в файл
-bool SaveNumberInFile(const std::string& filename, int key);// Сохранения числа в файл
-void clearFile(const std::string& filename);// Очистить файл
-
 
 int main(int argc, char* argv[])
 {
@@ -66,29 +53,17 @@ int main(int argc, char* argv[])
             if (root) {
                 cout << "\nTree:\n";//вывод в прямом порядке
                 printTree(root);
+                cout << "\nGraphics:\n\n";//вывод в прямом порядке
+                printTreeGraphics(root,1);
             }
             else cout << "\nTree is empty:\n";
             _getch();
             break;
         case '6':
-            /*
-            tnode *node2;
             while (!(fflush(stdin)) && !(printf("Enter key to search: ") && scanf_s("%d", &key)));//ввод ключа
             while (!(fflush(stdin)) && !(printf("Enter level to search: ") && scanf_s("%d", &level)));//ввод уровня
-            node2=findNode(root, key, level);
-            if (node2!=NULL)
-            {
-                cout << "Was found" << endl;
-                cout << node2->key << " level: " << node2->level << endl;
-                
-            }
-            
-            else cout << "Was not found" << endl;
-            */
-            
-
-            root = deleteRootSubTree(root);
-            cout << "Root is deleted" << endl;
+            root = deleteNode(root, key, level);
+            cout << "removing..." << endl;
             _getch();
             break;
         }
