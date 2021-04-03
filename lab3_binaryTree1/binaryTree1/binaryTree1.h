@@ -11,20 +11,23 @@
 
 using namespace std;
 
+// Структура узла
 struct tnode {// Узел дерева
     int key;// Ключ
-    int count;// Число вхождений
     int level;//уровень
     struct tnode* left;// Левый потомок
     struct tnode* right;// Правый потомок
     
 };
+
+// Сравнение чисел
 int numcmp(int a, int b)
 {
     if (a > b) return 1;
     if (a < b) return -1;
     if (a == b) return 0;
 }
+
 // Функция добавления узла к дереву
 struct tnode* addNode(struct tnode* node, int key) {
     int cond;
@@ -47,19 +50,23 @@ struct tnode* addNode(struct tnode* node, int key) {
             node->right->level = node->level + 1;
         }
     }
-        
-                
-        
+
     return node;
 }
+
 // Добавление N узлов к дереву с рандомным значением
 void randomAdd_N_Nodes(struct tnode** node, int quantity) {
     int number;
+    
+    
     for (int i = 0; i < quantity; i++) {
-        number = pow(-1,i)*i;// rand() % 100 - 50;
+        number = rand() % 100 - 50;
         *node=addNode(*node, number);
     }
+
+    
 }
+
 // Функция удаления поддерева
 void deleteSubTree(tnode* node) {
     if (node != NULL) {
@@ -68,16 +75,39 @@ void deleteSubTree(tnode* node) {
         delete node;
     }
 }
+
 // Функция вывода дерева
-void printTree(struct tnode* node) {
+void printTree(tnode* node) {
     if (node != NULL) {
         printTree(node->left);
-        cout << "ключ: " << node->key << "\t\tуровень: " << node->level << endl;
+        printf("ключ: %10d\tуровень: %10d\n", node->key, node->level);
         printTree(node->right);
     }
 
 }
-// TODO Удаление узла
+
+// Функция графического вывода дерева
+void printTreeGraphics(tnode* node, int level)
+{
+    if (node)
+    {
+        printTreeGraphics(node->left, level + 1);
+        for (int i = 0; i < level; i++) cout << "   ";
+        cout << node->key << endl;
+        printTreeGraphics(node->right, level + 1);
+    }
+}
+
+// Изменить уровень (node-level) каждого узла
+void changeLevel(tnode* node, int x) {
+    if (node != NULL) {
+        node->level += x;
+        changeLevel(node->left, x);
+        changeLevel(node->right, x);
+    }
+}
+
+// Удаление корня поддерева
 tnode* deleteRootSubTree(tnode* node) {
     if (node != NULL) {
         cout << "removing from root" << endl;
@@ -87,13 +117,14 @@ tnode* deleteRootSubTree(tnode* node) {
         }
         if (node->left != NULL && node->right == NULL) {
             node = node->left;// Присваиваем корню левую часть дерева (от корня)
-            return node;
+            changeLevel(node, -1);
         }
         if (node->left == NULL && node->right != NULL) {
             node = node->right;// Присваиваем корню правую часть дерева (от корня)
-            return node;
+            changeLevel(node, -1);
         }
         if (node->left != NULL && node->right != NULL) {
+            int height = 0; // Высота, на которую опустится левое поддерево
             tnode* left_node = node->left;// Сохраняем левую часть дерева (от корня)
             node = node->right;// Присваиваем корню правую часть дерева (от корня)
             //нужно левую часть дерева вставить после наименьшего элемента в дереве 
@@ -101,43 +132,49 @@ tnode* deleteRootSubTree(tnode* node) {
             tnode* tmp = node;// Временный узел для прохода по ветке
             while (tmp->left != NULL) {
                 tmp = (tmp)->left;
+                height++;
             }
-            tmp->left = left_node;// НЕ РАБОТАЕТ, РАЗОАБРАТЬСЯ С УКАЗАТЕЛЯМИ!
-            return node;
+            changeLevel(node, -1);
+            changeLevel(left_node, height);
+            tmp->left = left_node;// <последний наименьший элмент в правом дереве>->left = бывшее левое дерево
+
         }
         
-        
-        return node;// = *left_node;//<последний наименьший элмент в правом дереве>->left = бывшее левое дерево
-        
+        return node;
     }
     else node;
 }
 
-// Поиск в бинарном дереве
-tnode* findNode(tnode* node, int key, int level) {
-    tnode* ptr;
-    
+// Поиск в бинарном дереве и удаление узла
+tnode* deleteNode(tnode* node, int key, int level) {
+    tnode *ptr;// Указатель для прохода по дереву
+    tnode* ptr2;// Указатель для хранения поддерева, в котором удалена вершина
+    tnode* prev_ptr = node;// Указатель на предыдущий элемент (инициализация для компилятора, позже затрётся)
     if (node != NULL) {// Если дерево имеет хотя бы 1 элемент
-        if (node->key == key) // Если вершина дерева - то, что мы ищем,
-            return node;// Присвоим её node_ad
+        if (node->key == key && node->level==level) return deleteRootSubTree(node);// Если вершина дерева - то, что мы ищем,
         else {// Иначе ищём этот элемент, двигаясь по узлам по единственному пути
             ptr = node;
             while (ptr != NULL)
-                if (ptr->level == level && ptr->key == key) 
-                    return ptr;     
+                if (ptr->level == level && ptr->key == key) { 
+                    ptr2 = deleteRootSubTree(ptr); 
+                    if (prev_ptr->key > key) prev_ptr->left = ptr2;
+                    else prev_ptr->right = ptr2;
+                    return node;
+                }
                 else {
+                    prev_ptr = ptr;
                     if (ptr->key > key) ptr = ptr->left;
                     else ptr = ptr->right;
-                    if (ptr->level > level || ptr == NULL) return NULL;// Если прошли нужный уровень или узел пуст
+                    if (ptr == NULL) return node;// Если узел пуст
+                    if (ptr->level > level) return node;// Если прошли нужный уровень
                 }
                     
         }
     }
-    return NULL;
+    return node;
 }
 
-
-
+// Чтения количества элементов массива из файла
 int readArrayN(const std::string& filename)// Чтения количества элементов массива из файла
 {
     ifstream in;
@@ -160,6 +197,7 @@ int readArrayN(const std::string& filename)// Чтения количества элементов массив
     }
     return n;
 }
+
 // Сохранения числа в файл
 bool SaveNumberInFile(const std::string& filename, int key)
 {
